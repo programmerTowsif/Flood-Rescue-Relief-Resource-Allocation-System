@@ -123,12 +123,13 @@ The project will contain exactly **13 top-level classes and 1 interface**.
 ---
 
 ## 5. Team Members and Responsibilities
+# towsif
 
 Replace the placeholders with your actual names.
 
 | Member | Name | Main Responsibility |
 |---|---|---|
-| Member 1 | `________________` | Interface and request hierarchy |
+| Member 1 | `______________` | Interface and request hierarchy |
 | Member 2 | `________________` | Shelter, resource and allocation models |
 | Member 3 | `________________` | ReliefManager and Swing GUI |
 
