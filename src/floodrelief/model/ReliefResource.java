@@ -13,7 +13,7 @@ public abstract class ReliefResource{
             throw new IllegalArgumentException("resource name does not exits empty or null");
         }
         if(quantity < 0){
-            throw new IllegalArgumentException("quantity connot be negative.");
+            throw new IllegalArgumentException("quantity cannot be negative.");
         }
 
         this.resourceId = resourceId;
