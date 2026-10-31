@@ -8,13 +8,13 @@ public abstract class ReliefRequest{
     private String description;
 
     public ReliefRequest(int requestId, String requesterName, int peopleCount, int shelterId, String description){
-        if(rerequestId <= 0){
+        if(requestId <= 0){
             throw new IllegalArgumentException("Request Id must be positive");
         }
         if(requesterName == null || requesterName.trim().isEmpty()){
             throw new IllegalArgumentException("request name cannot be empty");
         }
-        if(ppeopleCount <= 0){
+        if(peopleCount <= 0){
             throw new IllegalArgumentException("people count must be possible");
         }
         if(shelterId <= 0){
