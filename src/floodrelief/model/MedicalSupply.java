@@ -7,9 +7,9 @@ public class MedicalSupply extends ReliefResource{
     public MedicalSupply(int resourceId, String resourceName, int quantity, String medicineName, String expiryDate){
         super(resourceId, resourceName, quantity);
 
-        if (medicineName == null || medicineName.trim().isEmpty()) {
+        if (medicineName == null || medicineName.trim().isEmpty()){
             throw new IllegalArgumentException("Medicine name cannot be empty");
-
+        }
         if(expiryDate == null || expiryDate.trim().isEmpty()){
             throw new IllegalArgumentException("Expiry date cannot be empty");
         }
