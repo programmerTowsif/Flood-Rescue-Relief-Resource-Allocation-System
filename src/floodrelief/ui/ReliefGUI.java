@@ -1,8 +1,9 @@
- 
+
 package floodrelief.ui;
 
 import java.awt.*;
 import java.time.LocalDate;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
@@ -12,7 +13,8 @@ import floodrelief.exception.InsufficientResourceException;
 
 public class ReliefGUI extends JFrame {
 
-    private final ReliefManager manager = new ReliefManager();
+    private final ReliefManager manager;
+    private final User loggedInUser;
 
     private JLabel[] stats = new JLabel[4];
 
@@ -35,9 +37,16 @@ public class ReliefGUI extends JFrame {
     // Shelter fields
     private JTextField[] shelterFields = new JTextField[5];
 
-    public ReliefGUI() {
+    // ================= CONSTRUCTOR =================
 
-        setTitle("Flood Rescue & Relief Resource Allocation System");
+    public ReliefGUI(ReliefManager manager, User loggedInUser) {
+
+        this.manager = manager;
+        this.loggedInUser = loggedInUser;
+
+        setTitle("Flood Rescue & Relief Resource Allocation System"
+                + " - " + loggedInUser.getRole());
+
         setSize(1150, 720);
         setMinimumSize(new Dimension(900, 600));
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -46,11 +55,28 @@ public class ReliefGUI extends JFrame {
         JTabbedPane tabs = new JTabbedPane();
 
         tabs.addTab("Dashboard", dashboard());
-        tabs.addTab("Manage Requests", requests());
-        tabs.addTab("Manage Resources", resources());
-        tabs.addTab("Manage Shelters", shelters());
-        tabs.addTab("Resource Allocation", allocation());
-        tabs.addTab("Allocation History", history());
+
+        String role = loggedInUser.getRole();
+
+        if (role.equalsIgnoreCase("Admin")) {
+
+            tabs.addTab("Manage Requests", requests());
+            tabs.addTab("Manage Resources", resources());
+            tabs.addTab("Manage Shelters", shelters());
+            tabs.addTab("Resource Allocation", allocation());
+            tabs.addTab("Allocation History", history());
+
+        } else if (role.equalsIgnoreCase("Relief Manager")) {
+
+            tabs.addTab("Manage Requests", requests());
+            tabs.addTab("Manage Resources", resources());
+            tabs.addTab("Resource Allocation", allocation());
+            tabs.addTab("Allocation History", history());
+
+        } else if (role.equalsIgnoreCase("Volunteer")) {
+
+            tabs.addTab("Manage Requests", requests());
+        }
 
         add(tabs);
 
@@ -222,15 +248,9 @@ public class ReliefGUI extends JFrame {
                 urgencyField.getText().trim()
             );
 
-            if (name.isEmpty()) {
+            if (name.isEmpty() || desc.isEmpty()) {
                 throw new IllegalArgumentException(
-                    "Requester name is required."
-                );
-            }
-
-            if (desc.isEmpty()) {
-                throw new IllegalArgumentException(
-                    "Description is required."
+                    "Requester name and description are required."
                 );
             }
 
@@ -288,7 +308,6 @@ public class ReliefGUI extends JFrame {
             info("Request added successfully.");
 
         } catch (Exception ex) {
-
             error(ex);
         }
     }
@@ -449,7 +468,6 @@ public class ReliefGUI extends JFrame {
             info("Resource added successfully.");
 
         } catch (Exception ex) {
-
             error(ex);
         }
     }
@@ -535,7 +553,6 @@ public class ReliefGUI extends JFrame {
             info("Shelter added successfully.");
 
         } catch (Exception ex) {
-
             error(ex);
         }
     }
@@ -583,7 +600,7 @@ public class ReliefGUI extends JFrame {
         try {
 
             if (reqChoice.getSelectedItem() == null
-                || resChoice.getSelectedItem() == null) {
+                    || resChoice.getSelectedItem() == null) {
 
                 throw new IllegalArgumentException(
                     "Please add requests and resources first."
@@ -607,11 +624,9 @@ public class ReliefGUI extends JFrame {
             info("Allocation successful.");
 
         } catch (InsufficientResourceException ex) {
-
             error(ex);
 
         } catch (Exception ex) {
-
             error(ex);
         }
     }
@@ -903,12 +918,100 @@ public class ReliefGUI extends JFrame {
         );
     }
 
+    // ================= LOGIN WINDOW =================
+
+    private static User showLoginWindow(ReliefManager manager) {
+
+        while (true) {
+
+            JTextField usernameField = new JTextField(15);
+            JPasswordField passwordField = new JPasswordField(15);
+
+            JPanel panel = new JPanel(new GridLayout(0, 1, 5, 5));
+
+            panel.add(new JLabel("Username:"));
+            panel.add(usernameField);
+
+            panel.add(new JLabel("Password:"));
+            panel.add(passwordField);
+
+            int result = JOptionPane.showConfirmDialog(
+                null,
+                panel,
+                "Flood Relief System - Login",
+                JOptionPane.OK_CANCEL_OPTION,
+                JOptionPane.PLAIN_MESSAGE
+            );
+
+            if (result != JOptionPane.OK_OPTION) {
+                return null;
+            }
+
+            String username = usernameField.getText().trim();
+
+            String password = new String(
+                passwordField.getPassword()
+            );
+
+            User user = manager.login(username, password);
+
+            if (user != null) {
+
+                JOptionPane.showMessageDialog(
+                    null,
+                    "Login Successful!\nWelcome "
+                        + user.getUsername()
+                        + "\nRole: " + user.getRole()
+                );
+
+                return user;
+
+            } else {
+
+                JOptionPane.showMessageDialog(
+                    null,
+                    "Invalid Username or Password!",
+                    "Login Failed",
+                    JOptionPane.ERROR_MESSAGE
+                );
+            }
+        }
+    }
+
     // ================= MAIN METHOD =================
 
     public static void main(String[] args) {
 
-        SwingUtilities.invokeLater(
-            () -> new ReliefGUI().setVisible(true)
-        );
+        SwingUtilities.invokeLater(() -> {
+
+            ReliefManager manager = new ReliefManager();
+
+            // Demo Admin account
+            manager.registerUser(
+                new User(1, "admin", "admin123", "Admin")
+            );
+
+            // Demo Relief Manager account
+            manager.registerUser(
+                new User(2, "manager", "manager123", "Relief Manager")
+            );
+
+            // Demo Volunteer account
+            manager.registerUser(
+                new User(3, "volunteer", "vol123", "Volunteer")
+            );
+
+            User loggedInUser = showLoginWindow(manager);
+
+            if (loggedInUser != null) {
+
+                ReliefGUI gui = new ReliefGUI(
+                    manager,
+                    loggedInUser
+                );
+
+                gui.setVisible(true);
+            }
+        });
     }
-} 
+}
