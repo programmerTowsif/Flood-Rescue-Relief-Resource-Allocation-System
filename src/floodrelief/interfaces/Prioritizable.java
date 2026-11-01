@@ -1,5 +1,6 @@
 package floodrelief.interfaces;
 
-public class Prioritizable {
-    
-}
+public interface Prioritizable {
+int calculatePriority();
+  
+}  
