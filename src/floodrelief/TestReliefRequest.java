@@ -6,6 +6,7 @@ import floodrelief.model.FoodRequest;
 import floodrelief.model.MedicalRequest;
 import floodrelief.model.MedicalSupply;
 import floodrelief.model.Shelter;
+import floodrelief.model.User;
 import floodrelief.model.FoodSupply;
 import floodrelief.model.WaterSupply;
 import floodrelief.model.ReliefAllocation;
@@ -330,6 +331,31 @@ public class TestReliefRequest {
             System.out.println("Medical Allocation Failed: "
                     + e.getMessage());
         }
+        
+
+        ReliefManager manager2 = new ReliefManager();
+        manager2.registerUser(
+    new User(1, "admin", "admin123", "Admin")
+);
+
+manager2.registerUser(
+    new User(2, "manager", "manager123", "Relief Manager")
+);
+
+manager2.registerUser(
+    new User(3, "volunteer", "vol123", "Volunteer")
+);
+
+User user = manager2.login("manager", "manager123");
+
+if (user != null) {
+    System.out.println("Login Successful!");
+    System.out.println("Username: " + user.getUsername());
+    System.out.println("Role: " + user.getRole());
+} else {
+    System.out.println("Invalid Login!");
+}
+
 
     }
 }
